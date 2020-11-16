@@ -1,2 +1,2 @@
 # qr-encoder
-Encodes alphanumeric text as a QR code
+Encodes text as a QR code.
