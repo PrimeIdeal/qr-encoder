@@ -1,5 +1,7 @@
 import argparse
 
+from common import select_encoder
+
 
 def get_parser() -> argparse.ArgumentParser:
     """
@@ -35,3 +37,15 @@ def get_parser() -> argparse.ArgumentParser:
     )
 
     return parser
+
+
+def main():
+    args = get_parser().parse_args()
+
+    if args.file_path is not None:
+        with open(args.file_path) as file:
+            message = file.read()
+    else:
+        message = args.text
+
+    encoder = select_encoder(message, args.correction_level)
