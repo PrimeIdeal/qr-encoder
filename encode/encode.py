@@ -1,6 +1,6 @@
 import argparse
 
-from common import select_encoder
+from encode.preliminary import select_encoder
 
 
 def get_parser() -> argparse.ArgumentParser:
