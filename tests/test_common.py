@@ -1,6 +1,6 @@
 import pytest
 
-from encode.common import (
+from encode.preliminary import (
     select_encoding,
     select_encoder
 )
