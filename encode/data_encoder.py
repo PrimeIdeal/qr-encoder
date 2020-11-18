@@ -1,7 +1,8 @@
 class qr_encoder:
 
-    def __init__(self):
-        pass
+    def __init__(self, message: str, correction_level: str):
+        self.message = message
+        self.correction_level = correction_level
 
     def get_version(self):
         pass
@@ -21,8 +22,8 @@ class qr_encoder:
 
 class numeric_encoder(qr_encoder):
 
-    def __init__(self):
-        pass
+    def __init__(self, message: str, correction_level: str):
+        qr_encoder.__init__(self, message, correction_level)
 
     def encode(self):
         pass
@@ -30,8 +31,8 @@ class numeric_encoder(qr_encoder):
 
 class alphanumeric_encoder(qr_encoder):
 
-    def __init__(self):
-        pass
+    def __init__(self, message: str, correction_level: str):
+        qr_encoder.__init__(self, message, correction_level)
 
     def encode(self):
         pass
@@ -39,8 +40,8 @@ class alphanumeric_encoder(qr_encoder):
 
 class bytes_encoder(qr_encoder):
 
-    def __init__(self):
-        pass
+    def __init__(self, message: str, correction_level: str):
+        qr_encoder.__init__(self, message, correction_level)
 
     def encode(self):
         pass
