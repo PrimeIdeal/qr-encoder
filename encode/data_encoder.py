@@ -34,10 +34,10 @@ class qr_encoder:
         ValueError
             Message is too long.
         """
-        mode = self._get_mode()
+        mode, msg_length = self._get_mode(), len(self.message)
 
         for idx, cap in enumerate(CHAR_CAP[mode][self.correction_level]):
-            if len(self.message) <= cap:
+            if msg_length <= cap:
                 return idx+1
 
         raise ValueError(
