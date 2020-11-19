@@ -16,36 +16,26 @@ class qr_encoder:
             The message to be encoded.
         correction_level : str
             Error correction level for the QR code.
-        """
-        self.message = message
-        self.correction_level = correction_level
-
-    def get_version(self) -> int:
-        """
-        Determines the smallest possible format for the QR code.
-
-        Returns
-        -------
-        int
-            QR format version.
 
         Raises
         ------
         ValueError
             Message is too long.
         """
-        mode, msg_length = self._get_mode(), len(self.message)
+        self.message = message
+        self.correction_level = correction_level
 
-        for idx, cap in enumerate(CHAR_CAP[mode][self.correction_level]):
+        mode, msg_length = self._get_mode(), len(message)
+
+        for idx, cap in enumerate(CHAR_CAP[mode][correction_level]):
             if msg_length <= cap:
-                return idx+1
-
-        raise ValueError(
-            'Message is too long for specified error correction level.'
-        )
-
-    def get_num_bits(self):
-        pass
+                self.version = idx+1
+                self.bit_cap = cap
+                break
+        else:
+            raise ValueError(
+                'Message is too long for specified error correction level.'
+            )
 
     def preprocess(self):
         pass
