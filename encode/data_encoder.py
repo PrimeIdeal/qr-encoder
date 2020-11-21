@@ -37,7 +37,7 @@ class qr_encoder:
                 break
         else:
             raise ValueError(
-                'Message is too long for specified error correction level.'
+                f'Message too long for correction level {correction_level}.'
             )
 
     def preprocess(self) -> str:
