@@ -31,7 +31,7 @@ class TestConstructor:
 
     def test_numeric_invalid_msg(self):
         test_msg, test_ec = ''.join('4' for _ in range(3599)), 'H'
-        error_msg = 'Message is too long for specified error correction level.'
+        error_msg = 'Message too long for correction level H.'
 
         with pytest.raises(ValueError) as error_info:
             numeric_encoder(test_msg, test_ec)
@@ -60,7 +60,7 @@ class TestConstructor:
 
     def test_alphanumeric_invalid_msg(self):
         test_msg, test_ec = ''.join('4' for _ in range(2181)), 'H'
-        error_msg = 'Message is too long for specified error correction level.'
+        error_msg = 'Message too long for correction level H.'
 
         with pytest.raises(ValueError) as error_info:
             alphanumeric_encoder(test_msg, test_ec)
@@ -89,7 +89,7 @@ class TestConstructor:
 
     def test_bytes_invalid_msg(self):
         test_msg, test_ec = ''.join('4' for _ in range(1499)), 'H'
-        error_msg = 'Message is too long for specified error correction level.'
+        error_msg = 'Message too long for correction level H.'
 
         with pytest.raises(ValueError) as error_info:
             bytes_encoder(test_msg, test_ec)

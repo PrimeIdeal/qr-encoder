@@ -39,10 +39,8 @@ class TestSelectEncoding:
     def test_string_over_valid_length(self):
         test_msg = ''.join('0' for _ in range(7090))
 
-        with pytest.raises(ValueError) as error_msg:
+        with pytest.raises(ValueError):
             select_encoding(test_msg)
-
-        assert str(error_msg.value) == 'Input exceeds maximum encoding length.'
 
 
 class TestSelectEncoder:
