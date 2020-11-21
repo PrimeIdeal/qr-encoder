@@ -1,6 +1,5 @@
 ALPHANUMERIC_CHARS = {' ', '$', '%', '*', '+', '-', '.', '/', ':'}
 
-
 BLOCK_INFORMATION = {
     1: {
         'L': (7, 1, 19, None, None),
@@ -244,7 +243,6 @@ BLOCK_INFORMATION = {
     }
 }
 
-
 CHAR_CAP = {
     'numeric': {
         'L': [41, 77, 127, 187, 255, 322, 370, 461, 552, 652,
@@ -302,9 +300,7 @@ CHAR_CAP = {
     }
 }
 
-
 CORRECTION_LEVELS = {'L', 'M', 'Q', 'H'}
-
 
 INDICATORS = {
     'numeric': ('0001', [10, 12, 14]),
