@@ -101,3 +101,63 @@ class TestConstructor:
             bytes_encoder(test_msg, test_ec)
 
         assert str(error_info.value) == error_msg
+
+
+class TestPreprocess:
+
+    @pytest.mark.parametrize(
+        'numeric_zeros, expected',
+        [
+            ((3, 'L'), '00010000000011'),
+            ((427, 'M'), '00010110101011'),
+            ((532, 'Q'), '0001001000010100'),
+            ((2714, 'H'), '000100101010011010')
+        ],
+        ids=[
+            '1L - 10 bit char count indicator',
+            '9M - 10 bit char count indicator',
+            '13Q - 12 bit char count indicator',
+            '38H - 14 bit char count indicator'
+        ],
+        indirect=['numeric_zeros']
+    )
+    def test_numeric_prefix(self, numeric_zeros, expected):
+        assert numeric_zeros.preprocess() == expected
+
+    @pytest.mark.parametrize(
+        'alphanumeric_zeros, expected',
+        [
+            ((7, 'L'), '0010000000111'),
+            ((200, 'M'), '0010011001000'),
+            ((512, 'Q'), '001001000000000'),
+            ((1592, 'H'), '00100011000111000')
+        ],
+        ids=[
+            '1L - 9 bit char count indicator',
+            '9M - 9 bit char count indicator',
+            '13Q - 11 bit char count indicator',
+            '38H - 13 bit char count indicator'
+        ],
+        indirect=['alphanumeric_zeros']
+    )
+    def test_alphanumeric_prefix(self, alphanumeric_zeros, expected):
+        assert alphanumeric_zeros.preprocess() == expected
+
+    @pytest.mark.parametrize(
+        'bytes_zeros, expected',
+        [
+            ((5, 'L'), '010000000101'),
+            ((141, 'M'), '010010001101'),
+            ((209, 'Q'), '01000000000011010001'),
+            ((1112, 'H'), '01000000010001011000')
+        ],
+        ids=[
+            '1L - 8 bit char count indicator',
+            '9M - 8 bit char count indicator',
+            '13Q - 16 bit char count indicator',
+            '38H - 16 bit char count indicator'
+        ],
+        indirect=['bytes_zeros']
+    )
+    def test_bytes_prefix(self, bytes_zeros, expected):
+        assert bytes_zeros.preprocess() == expected
