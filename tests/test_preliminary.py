@@ -9,6 +9,7 @@ from encode.data_encoder import (
     bytes_encoder,
     numeric_encoder
 )
+from tests.conftest import _get_test_msg
 
 
 class TestSelectEncoding:
@@ -37,7 +38,7 @@ class TestSelectEncoding:
         assert select_encoding(test_msg) == expected
 
     def test_string_over_valid_length(self):
-        test_msg = ''.join('0' for _ in range(7090))
+        test_msg = _get_test_msg(7090)
 
         with pytest.raises(ValueError):
             select_encoding(test_msg)
