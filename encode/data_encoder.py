@@ -169,7 +169,22 @@ class bytes_encoder(qr_encoder):
         return 'bytes'
 
     def encode(self):
-        pass
+        """
+        Encodes the message in bytes mode.
+
+        Each character of the message is converted to a hexadecimal byte,
+        which is then converted to an 8-bit binary string (left padded if
+        necessary). The binary strings are then concatenated into the
+        encoded message.
+
+        Returns
+        -------
+        str
+            Encoded message.
+        """
+        return ''.join(
+            _pad_bits(bin(ord(char))[2:], 8) for char in self.message
+        )
 
 
 def _pad_bits(bits: str, target_len: int, left: bool = True) -> str:
