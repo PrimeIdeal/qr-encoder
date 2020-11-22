@@ -1,4 +1,5 @@
 from encode.common import (
+    ALPHANUMERIC_MAP,
     CHAR_CAP,
     INDICATORS
 )
@@ -96,22 +97,22 @@ class numeric_encoder(qr_encoder):
         str
             Encoded message.
         """
-        encoded_msg = ''
+        encoded_message = ''
 
         for i in range(0, len(self.message), 3):
             group = int(self.message[i:i+3])
 
             if group > 99:
-                pad_length = 10
+                full_length = 10
             elif group > 9:
-                pad_length = 7
+                full_length = 7
             else:
-                pad_length = 4
+                full_length = 4
 
-            bin_group = _pad_bits(bin(group)[2:], pad_length)
-            encoded_msg += bin_group
+            bin_group = _pad_bits(bin(group)[2:], full_length)
+            encoded_message += bin_group
 
-        return encoded_msg
+        return encoded_message
 
 
 class alphanumeric_encoder(qr_encoder):
@@ -123,7 +124,40 @@ class alphanumeric_encoder(qr_encoder):
         return 'alphanumeric'
 
     def encode(self):
-        pass
+        """
+        Encodes the message in alphanumeric mode.
+
+        The message is split into 2-character groups. The first character of
+        the group is mapped to an integer in [0, 44], multiplied by 45, then
+        added to the integer representation of the second character. The sum
+        is then converted to a binary string (left padded if necessary). The
+        binary groups are then concatenated into the encoded string.
+
+        Returns
+        -------
+        str
+            Encoded message.
+        """
+        encoded_message = ''
+
+        for i in range(0, len(self.message), 2):
+            group = self.message[i:i+2]
+
+            if len(group) == 2:
+                first = int(group[0]) if group[0].isdecimal() \
+                    else ALPHANUMERIC_MAP[group[0]]
+                second = int(group[-1]) if group[-1].isdecimal() \
+                    else ALPHANUMERIC_MAP[group[-1]]
+
+                bin_group = _pad_bits(bin(45*first + second)[2:], 11)
+            else:
+                only = int(group) if group.isdecimal() \
+                    else ALPHANUMERIC_MAP[group]
+                bin_group = _pad_bits(bin(only)[2:], 6)
+
+            encoded_message += bin_group
+
+        return encoded_message
 
 
 class bytes_encoder(qr_encoder):
