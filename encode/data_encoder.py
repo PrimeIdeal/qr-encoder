@@ -60,9 +60,7 @@ class qr_encoder:
             char_prefix_length = indicator_lengths[2]
 
         char_count = bin(len(self.message))[2:]
-        pad_length = char_prefix_length - len(char_count)
-
-        char_count_prefix = pad_length*'0' + char_count
+        char_count_prefix = _pad_bits(char_count, char_prefix_length)
 
         return mode_prefix + char_count_prefix
 
@@ -84,8 +82,36 @@ class numeric_encoder(qr_encoder):
     def _get_mode(self):
         return 'numeric'
 
-    def encode(self):
-        pass
+    def encode(self) -> str:
+        """
+        Encodes the message in numeric mode.
+
+        The message is split into 3-digit groups (the final group may have 1
+        or 2 digits). Each group is converted to its binary representation and
+        is left padded if necessary. The binary groups are then concatenated
+        into the encoded string.
+
+        Returns
+        -------
+        str
+            Encoded message.
+        """
+        encoded_msg = ''
+
+        for i in range(0, len(self.message), 3):
+            group = int(self.message[i:i+3])
+
+            if group > 99:
+                pad_length = 10
+            elif group > 9:
+                pad_length = 7
+            else:
+                pad_length = 4
+
+            bin_group = _pad_bits(bin(group)[2:], pad_length)
+            encoded_msg += bin_group
+
+        return encoded_msg
 
 
 class alphanumeric_encoder(qr_encoder):
@@ -110,3 +136,28 @@ class bytes_encoder(qr_encoder):
 
     def encode(self):
         pass
+
+
+def _pad_bits(bits: str, target_len: int, left: bool = True) -> str:
+    """
+    Helper function: pads bits to a specified length with 0s.
+
+    Parameters
+    ----------
+    bits : str
+        Binary number to be padded.
+    target_len : int
+        Desired length.
+    left : bool, optional
+        Toggles padding from left or right (defaults to left).
+
+    Returns
+    -------
+    str
+        Padded string of bits.
+    """
+    pad_length = target_len - len(bits)
+
+    padded = pad_length*'0' + bits if left else bits + pad_length*'0'
+
+    return padded
