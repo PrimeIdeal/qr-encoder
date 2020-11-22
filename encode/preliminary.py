@@ -3,10 +3,10 @@ from encode.common import (
     CORRECTION_LEVELS
 )
 from encode.data_encoder import (
-    alphanumeric_encoder,
-    bytes_encoder,
-    numeric_encoder,
-    qr_encoder
+    AlphanumericEncoder,
+    BytesEncoder,
+    NumericEncoder,
+    QREncoder
 )
 
 
@@ -49,7 +49,7 @@ def select_encoding(msg: str) -> str:
     return 'alphanumeric'
 
 
-def select_encoder(msg: str, correction_level: str) -> qr_encoder:
+def select_encoder(msg: str, correction_level: str) -> QREncoder:
     """
     Selects an appropriate QR encoder for the message input.
 
@@ -79,8 +79,8 @@ def select_encoder(msg: str, correction_level: str) -> qr_encoder:
 
     encoding = select_encoding(msg)
     if encoding == 'numeric':
-        return numeric_encoder(msg, correction_level.upper())
+        return NumericEncoder(msg, correction_level.upper())
     if encoding == 'alphanumeric':
-        return alphanumeric_encoder(msg, correction_level.upper())
+        return AlphanumericEncoder(msg, correction_level.upper())
     else:
-        return bytes_encoder(msg, correction_level.upper())
+        return BytesEncoder(msg, correction_level.upper())

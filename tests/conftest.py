@@ -1,9 +1,9 @@
 import pytest
 
 from encode.data_encoder import (
-    numeric_encoder,
-    alphanumeric_encoder,
-    bytes_encoder
+    AlphanumericEncoder,
+    BytesEncoder,
+    NumericEncoder,
 )
 
 
@@ -30,18 +30,18 @@ def _get_test_msg(test_length: str, char: str = '0') -> str:
 def numeric_zeros(request):
     test_length, test_ec = request.param
     test_msg = _get_test_msg(test_length)
-    return numeric_encoder(test_msg, test_ec)
+    return NumericEncoder(test_msg, test_ec)
 
 
 @pytest.fixture(scope='function')
 def alphanumeric_zeros(request):
     test_length, test_ec = request.param
     test_msg = _get_test_msg(test_length)
-    return alphanumeric_encoder(test_msg, test_ec)
+    return AlphanumericEncoder(test_msg, test_ec)
 
 
 @pytest.fixture(scope='function')
 def bytes_zeros(request):
     test_length, test_ec = request.param
     test_msg = _get_test_msg(test_length)
-    return bytes_encoder(test_msg, test_ec)
+    return BytesEncoder(test_msg, test_ec)
