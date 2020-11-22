@@ -200,3 +200,18 @@ class TestEncode:
     def test_alphanumeric_message(self, message, expected):
         test_encoder = alphanumeric_encoder(message, 'L')
         assert test_encoder.encode() == expected
+
+    @pytest.mark.parametrize(
+        'message, expected',
+        [
+            ('Ghosst', '010001110110100001101111011100110111001101110100'),
+            ('1\n2', '001100010000101000110010')
+        ],
+        ids=[
+            'No escape characters',
+            'Escape characters'
+        ]
+    )
+    def test_bytes_message(self, message, expected):
+        test_encoder = bytes_encoder(message, 'L')
+        assert test_encoder.encode() == expected
