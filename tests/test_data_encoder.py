@@ -181,3 +181,22 @@ class TestEncode:
     def test_numeric_message(self, message, expected):
         test_encoder = numeric_encoder(message, 'L')
         assert test_encoder.encode() == expected
+
+    @pytest.mark.parametrize(
+        'message, expected',
+        [
+            ('-./:', '1110101111111110111011'),
+            ('D7D5', '0100101000001001001110'),
+            ('+-./:', '1110011000111110001101101100'),
+            ('D7-D5', '0100101000011101000010000101')
+        ],
+        ids=[
+            'Even length - no padding necessary',
+            'Even length - padding necessary',
+            'Odd length - no padding necessary',
+            'Odd length - padding necessary'
+        ]
+    )
+    def test_alphanumeric_message(self, message, expected):
+        test_encoder = alphanumeric_encoder(message, 'L')
+        assert test_encoder.encode() == expected
