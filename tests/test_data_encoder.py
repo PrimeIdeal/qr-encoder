@@ -155,3 +155,29 @@ class TestPreprocess:
     )
     def test_bytes_prefix(self, bytes_zeros, expected):
         assert bytes_zeros.preprocess() == expected
+
+
+class TestEncode:
+
+    @pytest.mark.parametrize(
+        'message, expected',
+        [
+            ('562677', '10001100101010100101'),
+            ('56267783', '100011001010101001011010011'),
+            ('5626779', '100011001010101001011001'),
+            ('562121', '10001100100001111001'),
+            ('562063', '10001100100111111'),
+            ('562003', '10001100100011')
+        ],
+        ids=[
+            'No padding necessary - all groups 3 digits',
+            'No padding necessary - 2 digit group',
+            'No padding necessary - 1 digit group',
+            'Pad required for 3 digit group',
+            'Pad required for 2 digit group',
+            'Pad required for 1 digit group'
+        ]
+    )
+    def test_numeric_message(self, message, expected):
+        test_encoder = numeric_encoder(message, 'L')
+        assert test_encoder.encode() == expected
