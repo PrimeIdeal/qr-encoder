@@ -1,16 +1,13 @@
-from encode.common import (
-    ALPHANUMERIC_MAP,
-    CHAR_CAP,
-    INDICATORS
-)
+from abc import abstractmethod
+from encode.common import ALPHANUMERIC_MAP, CHAR_CAP, INDICATORS
 
 
-class qr_encoder:
+class QREncoder:
     """
     QR Encoder object.
     """
 
-    def __init__(self, message: str, correction_level: str):
+    def __init__(self, message: str, correction_level: str) -> None:
         """
         Constructor for the qr_encoder class.
 
@@ -29,11 +26,11 @@ class qr_encoder:
         self.message = message
         self.correction_level = correction_level
 
-        mode, msg_length = self._get_mode(), len(message)
+        mode, msg_length = self.mode, len(message)
 
         for idx, cap in enumerate(CHAR_CAP[mode][correction_level]):
             if msg_length <= cap:
-                self.version = idx+1
+                self.version = idx + 1
                 self.bit_cap = cap
                 break
         else:
@@ -50,7 +47,7 @@ class qr_encoder:
         str
             Concatenated prefixes.
         """
-        mode = self._get_mode()
+        mode = self.mode
         mode_prefix, indicator_lengths = INDICATORS[mode]
 
         if self.version < 10:
@@ -65,23 +62,28 @@ class qr_encoder:
 
         return mode_prefix + char_count_prefix
 
+    # TODO: More description here? Return type?
     def postprocess(self):
         pass
 
+    @abstractmethod
+    def encode(self) -> str:
+        """Encodes self.message."""
+        pass
+
+    # TODO: More description here? Return type?
     def correct_error(self):
         pass
 
-    def _get_mode(self):
+    @property
+    def mode(self) -> str:
         return 'kanji'
 
 
-class numeric_encoder(qr_encoder):
+class NumericEncoder(QREncoder):
     """
     QR Encoder using numeric encoding mode.
     """
-
-    def _get_mode(self):
-        return 'numeric'
 
     def encode(self) -> str:
         """
@@ -114,14 +116,15 @@ class numeric_encoder(qr_encoder):
 
         return encoded_message
 
+    @property
+    def mode(self) -> str:
+        return 'numeric'
 
-class alphanumeric_encoder(qr_encoder):
+
+class AlphanumericEncoder(QREncoder):
     """
     QR Encoder using alphanumeric encoding mode.
     """
-
-    def _get_mode(self):
-        return 'alphanumeric'
 
     def encode(self):
         """
@@ -141,32 +144,34 @@ class alphanumeric_encoder(qr_encoder):
         encoded_message = ''
 
         for i in range(0, len(self.message), 2):
-            group = self.message[i:i+2]
+            group = self.message[i: i + 2]
 
+            first_char = int(
+                group[0]) if group[0].isdecimal() else ALPHANUMERIC_MAP[
+                group[0]]
+            second_char = int(
+                group[-1]) if group[-1].isdecimal() else ALPHANUMERIC_MAP[
+                group[-1]]
+
+            # TODO: Where is the 11 coming from? The 6 below?
             if len(group) == 2:
-                first = int(group[0]) if group[0].isdecimal() \
-                    else ALPHANUMERIC_MAP[group[0]]
-                second = int(group[-1]) if group[-1].isdecimal() \
-                    else ALPHANUMERIC_MAP[group[-1]]
-
-                bin_group = _pad_bits(bin(45*first + second)[2:], 11)
+                bin_group = _pad_bits(
+                    bin(45 * first_char + second_char)[2:], 11)
             else:
-                only = int(group) if group.isdecimal() \
-                    else ALPHANUMERIC_MAP[group]
-                bin_group = _pad_bits(bin(only)[2:], 6)
+                bin_group = _pad_bits(bin(second_char)[2:], 6)
 
             encoded_message += bin_group
-
         return encoded_message
 
+    @property
+    def mode(self) -> str:
+        return 'alphanumeric'
 
-class bytes_encoder(qr_encoder):
+
+class BytesEncoder(QREncoder):
     """
     QR Encoder using bytes encoding mode.
     """
-
-    def _get_mode(self):
-        return 'bytes'
 
     def encode(self):
         """
@@ -186,27 +191,30 @@ class bytes_encoder(qr_encoder):
             _pad_bits(bin(ord(char))[2:], 8) for char in self.message
         )
 
+    @property
+    def mode(self) -> str:
+        return 'bytes'
 
-def _pad_bits(bits: str, target_len: int, left: bool = True) -> str:
+
+def _pad_bits(bit_str: str, target_len: int, pad_from_left: bool = True) -> str:
     """
     Helper function: pads bits to a specified length with 0s.
 
     Parameters
     ----------
-    bits : str
+    bit_str : str
         Binary number to be padded.
     target_len : int
         Desired length.
-    left : bool, optional
+    pad_from_left : bool, optional
         Toggles padding from left or right (defaults to left).
 
     Returns
     -------
     str
-        Padded string of bits.
+        Padded string of bits. If the length of bit_str is greater than
+        target_len, delete from the left or right according to pad_from_left.
     """
-    pad_length = target_len - len(bits)
 
-    padded = pad_length*'0' + bits if left else bits + pad_length*'0'
-
-    return padded
+    skip_val = (-1) ** int(pad_from_left)
+    return (bit_str[::skip_val] + '0' * target_len)[:target_len][::skip_val]

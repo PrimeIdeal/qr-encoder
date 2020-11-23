@@ -1,9 +1,9 @@
 import pytest
 
 from encode.data_encoder import (
-    alphanumeric_encoder,
-    bytes_encoder,
-    numeric_encoder
+    AlphanumericEncoder,
+    BytesEncoder,
+    NumericEncoder,
 )
 
 
@@ -34,7 +34,7 @@ class TestConstructor:
         error_msg = 'Message too long for correction level H.'
 
         with pytest.raises(ValueError) as error_info:
-            numeric_encoder(test_msg, test_ec)
+            NumericEncoder(test_msg, test_ec)
 
         assert str(error_info.value) == error_msg
 
@@ -63,7 +63,7 @@ class TestConstructor:
         error_msg = 'Message too long for correction level H.'
 
         with pytest.raises(ValueError) as error_info:
-            alphanumeric_encoder(test_msg, test_ec)
+            AlphanumericEncoder(test_msg, test_ec)
 
         assert str(error_info.value) == error_msg
 
@@ -92,7 +92,7 @@ class TestConstructor:
         error_msg = 'Message too long for correction level H.'
 
         with pytest.raises(ValueError) as error_info:
-            bytes_encoder(test_msg, test_ec)
+            BytesEncoder(test_msg, test_ec)
 
         assert str(error_info.value) == error_msg
 
@@ -179,7 +179,7 @@ class TestEncode:
         ]
     )
     def test_numeric_message(self, message, expected):
-        test_encoder = numeric_encoder(message, 'L')
+        test_encoder = NumericEncoder(message, 'L')
         assert test_encoder.encode() == expected
 
     @pytest.mark.parametrize(
@@ -198,7 +198,7 @@ class TestEncode:
         ]
     )
     def test_alphanumeric_message(self, message, expected):
-        test_encoder = alphanumeric_encoder(message, 'L')
+        test_encoder = AlphanumericEncoder(message, 'L')
         assert test_encoder.encode() == expected
 
     @pytest.mark.parametrize(
@@ -213,5 +213,5 @@ class TestEncode:
         ]
     )
     def test_bytes_message(self, message, expected):
-        test_encoder = bytes_encoder(message, 'L')
+        test_encoder = BytesEncoder(message, 'L')
         assert test_encoder.encode() == expected
