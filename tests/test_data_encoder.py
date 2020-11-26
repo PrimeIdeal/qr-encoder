@@ -97,7 +97,7 @@ class TestConstructor:
         assert str(error_info.value) == error_msg
 
 
-class TestPreprocess:
+class TestGetPrefix:
 
     @pytest.mark.parametrize(
         'numeric_zeros, expected',
@@ -116,7 +116,7 @@ class TestPreprocess:
         indirect=['numeric_zeros']
     )
     def test_numeric_prefix(self, numeric_zeros, expected):
-        assert numeric_zeros.preprocess() == expected
+        assert numeric_zeros.get_prefix() == expected
 
     @pytest.mark.parametrize(
         'alphanumeric_zeros, expected',
@@ -128,14 +128,14 @@ class TestPreprocess:
         ],
         ids=[
             '1L - 9 bit char count indicator',
-            '9M - 9 bit char count indicator',
-            '13Q - 11 bit char count indicator',
+            '8M - 9 bit char count indicator',
+            '17Q - 11 bit char count indicator',
             '38H - 13 bit char count indicator'
         ],
         indirect=['alphanumeric_zeros']
     )
     def test_alphanumeric_prefix(self, alphanumeric_zeros, expected):
-        assert alphanumeric_zeros.preprocess() == expected
+        assert alphanumeric_zeros.get_prefix() == expected
 
     @pytest.mark.parametrize(
         'bytes_zeros, expected',
@@ -147,14 +147,14 @@ class TestPreprocess:
         ],
         ids=[
             '1L - 8 bit char count indicator',
-            '9M - 8 bit char count indicator',
+            '8M - 8 bit char count indicator',
             '13Q - 16 bit char count indicator',
             '38H - 16 bit char count indicator'
         ],
         indirect=['bytes_zeros']
     )
     def test_bytes_prefix(self, bytes_zeros, expected):
-        assert bytes_zeros.preprocess() == expected
+        assert bytes_zeros.get_prefix() == expected
 
 
 class TestEncode:
@@ -215,3 +215,51 @@ class TestEncode:
     def test_bytes_message(self, message, expected):
         test_encoder = BytesEncoder(message, 'L')
         assert test_encoder.encode() == expected
+
+
+class TestGetNumBits:
+
+    @pytest.mark.parametrize(
+        'numeric_zeros, expected',
+        [
+            ((3, 'L'), 152),
+            ((427, 'M'), 1456)
+        ],
+        ids=[
+            'Single group',
+            'Two groups'
+        ],
+        indirect=['numeric_zeros']
+    )
+    def test_numeric_num_bits(self, numeric_zeros, expected):
+        assert numeric_zeros.get_num_bits() == expected
+
+    @pytest.mark.parametrize(
+        'alphanumeric_zeros, expected',
+        [
+            ((7, 'L'), 152),
+            ((200, 'M'), 1232)
+        ],
+        ids=[
+            'Single group',
+            'Two groups'
+        ],
+        indirect=['alphanumeric_zeros']
+    )
+    def test_alphanumeric_num_bits(self, alphanumeric_zeros, expected):
+        assert alphanumeric_zeros.get_num_bits() == expected
+
+    @pytest.mark.parametrize(
+        'bytes_zeros, expected',
+        [
+            ((5, 'L'), 152),
+            ((141, 'M'), 1232)
+        ],
+        ids=[
+            'Single group',
+            'Two groups'
+        ],
+        indirect=['bytes_zeros']
+    )
+    def test_bytes_num_bits(self, bytes_zeros, expected):
+        assert bytes_zeros.get_num_bits() == expected
