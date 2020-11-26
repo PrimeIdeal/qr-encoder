@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from encode.common import ALPHANUMERIC_MAP, CHAR_CAP, INDICATORS
+from encode.common import ALPHANUMERIC_MAP, BLOCK_INFORMATION, CHAR_CAP, INDICATORS
 
 
 class QREncoder:
@@ -38,7 +38,7 @@ class QREncoder:
                 f'Message too long for correction level {correction_level}.'
             )
 
-    def preprocess(self) -> str:
+    def get_prefix(self) -> str:
         """
         Fetches mode and character count prefixes for the message.
 
@@ -62,9 +62,47 @@ class QREncoder:
 
         return mode_prefix + char_count_prefix
 
-    # TODO: More description here? Return type?
-    def postprocess(self):
+    def get_suffix(self, encoded_length: int) -> str:
+        """
+        Generates a suffix to extend the encoded message to its required
+        length.
+
+        The encoded message's required length depends on the encoder version
+        and error correction level. To achieve the required length, a
+        suffix of 0s is added if the length is not a multiple of 8, followed
+        by repeating pad bytes.
+
+        Parameters
+        ----------
+        encoded_length : int
+            The length of the encoded message.
+
+        Returns
+        -------
+        str
+            The encoded message's suffix.
+        """
         pass
+
+    def get_num_bits(self):
+        """
+        Returns the required length of the encoded message based on encoder
+        characteristics.
+
+        Data codewords are 8 bits each.
+
+        Returns
+        -------
+        int
+            The required number of bits.
+        """
+        block_info = BLOCK_INFORMATION[self.version][self.correction_level]
+
+        codeword_count = block_info[1]*block_info[2]
+        if block_info[3]:
+            codeword_count += block_info[3]*block_info[4]
+
+        return 8*codeword_count
 
     @abstractmethod
     def encode(self) -> str:
@@ -133,8 +171,9 @@ class AlphanumericEncoder(QREncoder):
         The message is split into 2-character groups. The first character of
         the group is mapped to an integer in [0, 44], multiplied by 45, then
         added to the integer representation of the second character. The sum
-        is then converted to a binary string (left padded if necessary). The
-        binary groups are then concatenated into the encoded string.
+        is then converted to 11-bit binary (6 if the final group is only one
+        character). The binary groups are then concatenated into the encoded
+        string.
 
         Returns
         -------
@@ -196,7 +235,11 @@ class BytesEncoder(QREncoder):
         return 'bytes'
 
 
-def _pad_bits(bit_str: str, target_len: int, pad_from_left: bool = True) -> str:
+def _pad_bits(
+    bit_str: str,
+    target_len: int,
+    pad_from_left: bool = True
+) -> str:
     """
     Helper function: pads bits to a specified length with 0s.
 
