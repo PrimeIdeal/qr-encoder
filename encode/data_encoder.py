@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from encode.common import ALPHANUMERIC_MAP, BLOCK_INFORMATION, CHAR_CAP, INDICATORS
+from encode.common import ALPHANUMERIC_CHARS, BLOCK_INFORMATION, CHAR_CAP, INDICATORS
 
 
 class QREncoder:
@@ -185,21 +185,23 @@ class AlphanumericEncoder(QREncoder):
         for i in range(0, len(self.message), 2):
             group = self.message[i: i + 2]
 
-            first_char = int(
-                group[0]) if group[0].isdecimal() else ALPHANUMERIC_MAP[
-                group[0]]
-            second_char = int(
-                group[-1]) if group[-1].isdecimal() else ALPHANUMERIC_MAP[
-                group[-1]]
+            chars = []
+            for char in group:
+                if char.isdecimal():
+                    chars.append(int(char))
+                elif char in ALPHANUMERIC_CHARS:
+                    chars.append(ALPHANUMERIC_CHARS[char])
+                else:
+                    chars.append(ord(char)-55)
 
-            # TODO: Where is the 11 coming from? The 6 below?
             if len(group) == 2:
                 bin_group = _pad_bits(
-                    bin(45 * first_char + second_char)[2:], 11)
+                    bin(45 * chars[0] + chars[1])[2:], 11)
             else:
-                bin_group = _pad_bits(bin(second_char)[2:], 6)
+                bin_group = _pad_bits(bin(chars[0])[2:], 6)
 
             encoded_message += bin_group
+
         return encoded_message
 
     @property
