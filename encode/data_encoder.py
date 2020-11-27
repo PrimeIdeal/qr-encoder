@@ -70,7 +70,7 @@ class QREncoder:
         The encoded message's required length depends on the encoder version
         and error correction level. To achieve the required length, a
         suffix of 0s is added if the length is not a multiple of 8, followed
-        by repeating pad bytes.
+        by repeating pad bytes (11101100, 00010001).
 
         Parameters
         ----------
@@ -82,7 +82,21 @@ class QREncoder:
         str
             The encoded message's suffix.
         """
-        pass
+        required_bits, suffix = self.get_num_bits(), ''
+        pad_bytes = ('11101100', '00010001')
+
+        if encoded_length < required_bits:
+            suffix += min(4, required_bits-encoded_length)*'0'
+
+            if (encoded_length + len(suffix)) % 8:
+                suffix += (8 - ((encoded_length + len(suffix)) % 8))*'0'
+
+            idx = 0
+            while (encoded_length + len(suffix)) < required_bits:
+                suffix += pad_bytes[idx]
+                idx = (idx + 1) % 2
+
+        return suffix
 
     def get_num_bits(self):
         """
