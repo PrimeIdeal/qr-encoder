@@ -263,3 +263,62 @@ class TestGetNumBits:
     )
     def test_bytes_num_bits(self, bytes_zeros, expected):
         assert bytes_zeros.get_num_bits() == expected
+
+
+class TestGetSuffix:
+
+    @pytest.mark.parametrize(
+        'numeric_zeros, expected',
+        [
+            ((427, 'M'), '0'*7 + '1110110000010001'*63),
+            ((532, 'Q'), '0'*4 + '1110110000010001'*87 + '11101100'),
+            ((2714, 'H'), '0'*4 + '1110110000010001'*400)
+        ],
+        ids=[
+            '9M - 10 bit char count indicator',
+            '13Q - 12 bit char count indicator',
+            '38H - 14 bit char count indicator'
+        ],
+        indirect=['numeric_zeros']
+    )
+    def test_numeric_suffix(self, numeric_zeros, expected):
+        test_len = len(numeric_zeros.get_prefix() + numeric_zeros.message)
+        assert numeric_zeros.get_suffix(test_len) == expected
+
+    @pytest.mark.parametrize(
+        'alphanumeric_zeros, expected',
+        [
+            ((200, 'M'), '0'*11 + '1110110000010001'*63),
+            ((512, 'Q'), '0'*9 + '1110110000010001'*150),
+            ((1592, 'H'), '0'*7 + '1110110000010001'*470)
+        ],
+        ids=[
+            '8M - 9 bit char count indicator',
+            '17Q - 11 bit char count indicator',
+            '38H - 13 bit char count indicator'
+        ],
+        indirect=['alphanumeric_zeros']
+    )
+    def test_alphanumeric_suffix(self, alphanumeric_zeros, expected):
+        test_len = len(
+            alphanumeric_zeros.get_prefix() + alphanumeric_zeros.message
+        )
+        assert alphanumeric_zeros.get_suffix(test_len) == expected
+
+    @pytest.mark.parametrize(
+        'bytes_zeros, expected',
+        [
+            ((141, 'M'), '0'*7 + '1110110000010001'*67),
+            ((209, 'Q'), '0'*11 + '1110110000010001'*107),
+            ((1112, 'H'), '0'*4 + '1110110000010001'*500)
+        ],
+        ids=[
+            '8M - 8 bit char count indicator',
+            '13Q - 16 bit char count indicator',
+            '38H - 16 bit char count indicator'
+        ],
+        indirect=['bytes_zeros']
+    )
+    def test_bytes_suffix(self, bytes_zeros, expected):
+        test_len = len(bytes_zeros.get_prefix() + bytes_zeros.message)
+        assert bytes_zeros.get_suffix(test_len) == expected
