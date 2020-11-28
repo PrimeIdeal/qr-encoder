@@ -10,12 +10,12 @@ from encode.common import (
 
 class QREncoder:
     """
-    QR Encoder object.
+    Encodes a message as a QR code.
     """
 
     def __init__(self, message: str, correction_level: str) -> None:
         """
-        Constructor for the qr_encoder class.
+        Constructor for the QREncoder class.
 
         Parameters
         ----------
