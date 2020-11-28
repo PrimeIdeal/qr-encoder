@@ -2,9 +2,22 @@ from typing import List, Tuple, Dict
 
 
 class ErrorCorrector:
+    """
+    Generates error correction bytes for the QREncoder object.
+    """
 
-    def __init__(self, block_info: Tuple[int]):
-        pass
+    def __init__(self, block_info: Tuple[int]) -> None:
+        """
+        Constructor for the ErrorCorrector class.
+        """
+        self.exp_store, self.log_store = _create_stores()
+
+        self.num_correction_bytes = block_info[0]*block_info[1]
+        self.num_message_bytes = block_info[2]*block_info[1]
+
+        if block_info[3]:
+            self.num_correction_bytes += block_info[0]*block_info[3]
+            self.num_message_bytes += block_info[4]*block_info[3]
 
     def generate_correction_bytes(self):
         pass
@@ -35,10 +48,12 @@ class ErrorCorrector:
         pass
 
 
-def _create_stores():
+def _create_stores() -> Dict[int, int]:
     """
-    Helper function: creates maps from powers of 2 to the values of their
-    exponents in GF(2^8) and vice versa.
+    Helper function: creates shortcut stores for GF(2^8) arithmetic.
+
+    Creates maps from powers of 2 to the values of their exponents in GF(2^8)
+    and vice versa.
 
     Returns
     -------
