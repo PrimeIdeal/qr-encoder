@@ -1,3 +1,31 @@
+def _pad_bits(
+    bit_str: str,
+    target_len: int,
+    pad_from_left: bool = True
+) -> str:
+    """
+    Helper function: pads bits to a specified length with 0s.
+
+    Parameters
+    ----------
+    bit_str : str
+        Binary number to be padded.
+    target_len : int
+        Desired length.
+    pad_from_left : bool, optional
+        Toggles padding from left or right (defaults to left).
+
+    Returns
+    -------
+    str
+        Padded string of bits. If the length of bit_str is greater than
+        target_len, delete from the left or right according to pad_from_left.
+    """
+
+    skip_val = (-1) ** int(pad_from_left)
+    return (bit_str[::skip_val] + '0' * target_len)[:target_len][::skip_val]
+
+
 ALPHANUMERIC_CHARS = {
     ' ': 36, '$': 37, '%': 38, '*': 39, '+': 40, '-': 41, '.': 42, '/': 43,
     ':': 44

@@ -1,5 +1,11 @@
 from abc import abstractmethod
-from encode.common import ALPHANUMERIC_CHARS, BLOCK_INFORMATION, CHAR_CAP, INDICATORS
+from encode.common import (
+    ALPHANUMERIC_CHARS,
+    BLOCK_INFORMATION,
+    CHAR_CAP,
+    INDICATORS,
+    _pad_bits
+)
 
 
 class QREncoder:
@@ -91,10 +97,10 @@ class QREncoder:
             if (encoded_length + len(suffix)) % 8:
                 suffix += (8 - ((encoded_length + len(suffix)) % 8))*'0'
 
-            idx = 0
+            idx = False
             while (encoded_length + len(suffix)) < required_bits:
                 suffix += pad_bytes[idx]
-                idx = (idx + 1) % 2
+                idx = not idx
 
         return suffix
 
@@ -249,31 +255,3 @@ class BytesEncoder(QREncoder):
     @property
     def mode(self) -> str:
         return 'bytes'
-
-
-def _pad_bits(
-    bit_str: str,
-    target_len: int,
-    pad_from_left: bool = True
-) -> str:
-    """
-    Helper function: pads bits to a specified length with 0s.
-
-    Parameters
-    ----------
-    bit_str : str
-        Binary number to be padded.
-    target_len : int
-        Desired length.
-    pad_from_left : bool, optional
-        Toggles padding from left or right (defaults to left).
-
-    Returns
-    -------
-    str
-        Padded string of bits. If the length of bit_str is greater than
-        target_len, delete from the left or right according to pad_from_left.
-    """
-
-    skip_val = (-1) ** int(pad_from_left)
-    return (bit_str[::skip_val] + '0' * target_len)[:target_len][::skip_val]
